@@ -63,13 +63,10 @@ fn main() {
         let result = snake::move_snake(&mut grid, &mut snake);
         match result {
             Ok(length) => println!("Snake length is {}", length),
-            Err(_) => {
-                println!("Snake over!");
-                break 'game;
-            }
+            Err(_) => break 'game
         }
         
-        snake::vis::display_frame(&mut canvas, &grid);
+        snake::vis::display_frame(&mut canvas, &grid, &snake);
 
         thread::sleep(time::Duration::from_millis(100));
     }   

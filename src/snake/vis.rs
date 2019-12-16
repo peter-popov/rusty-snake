@@ -4,7 +4,11 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2::EventPump;
 
-use crate::snake::types::{Cell, Grid, Position};
+extern crate sdl2_unifont;
+
+use sdl2_unifont::renderer::SurfaceRenderer;
+
+use crate::snake::types::{Cell, Snake, Grid, Position};
 
 // this function initializes the canvas
 pub fn init(width: u32, height: u32) -> (Canvas<Window>, EventPump) {
@@ -51,7 +55,8 @@ fn render_cell(renderer: &mut Canvas<Window>,
 
 pub fn display_frame(
     renderer: &mut Canvas<Window>,
-    grid: &Grid
+    grid: &Grid,
+    snake: &Snake
 ) {
     renderer.set_draw_color(Color::RGB(0, 0, 0));
     renderer.clear();
@@ -65,5 +70,23 @@ pub fn display_frame(
             render_cell(renderer, &position, &size, grid.get(&position));
         }
     }
+    draw_score(renderer, snake.length());
     renderer.present();
+}
+
+fn draw_score(canvas: &mut Canvas<Window>, score: usize) {
+    let mut renderer = SurfaceRenderer::new(Color::RGB(0xBB, 0xBB, 0xBB), 
+                                            Color::RGBA(0, 0, 0, 0));
+        
+    renderer.bold = true;
+    renderer.scale = 1;
+    let surface = renderer.draw(&score.to_string()).unwrap();
+
+    let texture_creator = canvas.texture_creator();
+
+    let demo_tex = texture_creator
+            .create_texture_from_surface(surface)
+            .unwrap();
+
+    canvas.copy(&demo_tex, None, Rect::new(0, 0, 60, 60)).unwrap();
 }
