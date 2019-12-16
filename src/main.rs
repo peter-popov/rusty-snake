@@ -6,21 +6,16 @@ use std::thread;
 use std::time;
 
 
-pub mod lib;
+pub mod snake;
+
+use snake::types::{Grid, Snake, Position, Direction};
 
 // this is main
 fn main() {
-    let w: u32 = 1600;
-    let h: u32 = 1200;
-    let rows: u32 = 60;
-    let columns: u32 = 80;
-    let (mut canvas, mut events) = lib::init(w, h);
+    let (mut canvas, mut events) = snake::vis::init(1600, 1200);
 
-    let mut grid = lib::grid_init(columns, rows);
-    let cell_width: u32 = w / columns;
-    let mut direction = (1, 0);
-    let mut snake = lib::snake::init_snake(columns, rows);
-
+    let mut grid = Grid::new(80, 60);
+    let mut snake = Snake::new(Position(40, 30), Direction(1,0));
 
     thread::spawn(move || {
         // some work here
@@ -38,40 +33,46 @@ fn main() {
                     keycode: Some(Keycode::Up),
                     ..
                 } => {
-                    direction = (0, -1);
+                    snake.turn(Direction(0, -1));
                     continue 'game;
                 },
                 Event::KeyDown {
                     keycode: Some(Keycode::Down),
                     ..
                 } => {
-                    direction = (0, 1);
+                    snake.turn(Direction(0, 1));
                     continue 'game;
                 },
                 Event::KeyDown {
                     keycode: Some(Keycode::Left),
                     ..
                 } => {
-                    direction = (-1, 0);
+                    snake.turn(Direction(-1, 0));
                     continue 'game;
                 },
                 Event::KeyDown {
                     keycode: Some(Keycode::Right),
                     ..
                 } => {
-                    direction = (1, 0);
+                    snake.turn(Direction(1, 0));
                     continue 'game;
                 },
                 _ => continue 'game,
             }
         }
 
-        lib::snake::move_snake(&mut snake, &direction);
+
+        let result = snake::move_snake(&mut grid, &mut snake);
+        match result {
+            Ok(length) => println!("Snake length is {}", length),
+            Err(_) => {
+                println!("Snake over!");
+                break 'game;
+            }
+        }
         
-        grid = lib::snake::snake_to_grid(grid, &snake, columns, rows);
+        snake::vis::display_frame(&mut canvas, &grid);
 
-        lib::display_frame(&mut canvas, &grid, &columns, &rows, &cell_width);
-
-        thread::sleep(time::Duration::from_millis(800));
+        thread::sleep(time::Duration::from_millis(100));
     }   
 }
