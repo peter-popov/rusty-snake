@@ -19,11 +19,6 @@ pub struct Grid {
     pub ny: usize
 }
 
-// Rust % operator bahaves a bit different to python on negative numbers
-fn modulo<I: Integer + Copy>(a: &I, b: &I) -> I {
-    ((*a % *b) + *b) % *b
-}
-
 impl Grid {
     pub fn new(nx: usize, ny: usize) -> Grid {
         Grid{
@@ -33,9 +28,14 @@ impl Grid {
         }
     }
 
+    // Rust % operator bahaves a bit different to python on negative numbers
+    fn modulo<I: Integer + Copy>(a: &I, b: &I) -> I {
+        ((*a % *b) + *b) % *b
+    }
+
     fn normilize(&self, position: &Position) -> (usize, usize) {
-        let x = modulo(&position.0, &(self.nx as i32));
-        let y = modulo(&position.1, &(self.ny as i32));
+        let x = Grid::modulo(&position.0, &(self.nx as i32));
+        let y = Grid::modulo(&position.1, &(self.ny as i32));
         (x as usize, y as usize)
     }
 
@@ -49,6 +49,7 @@ impl Grid {
         &self.cells[x][y]
     }
 }
+
 
 pub struct Snake {
     direction: Direction,
@@ -65,7 +66,7 @@ impl Snake {
         snake
     }
 
-    pub fn turn(&mut self, direction: Direction) {
+    pub fn turn(&mut self, direction: Direction) {  
         if self.direction.0 != direction.0 && self.direction.1 != direction.1 {
             self.direction = direction;
         }
@@ -78,7 +79,6 @@ impl Snake {
                                     front_position.1 + self.direction.1);
                 self.body.push_front(next.clone());
                 let last = self.body.pop_back();
-                println!("Next head: {}, {}", next.0, next.1);
                 (next, last.unwrap())
             },
             None => panic!("Must never happen")

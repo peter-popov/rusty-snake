@@ -12,14 +12,12 @@ use snake::types::{Grid, Snake, Position, Direction};
 
 // this is main
 fn main() {
-    let (mut canvas, mut events) = snake::vis::init(1600, 1200);
+    let (mut canvas, mut events) = snake::vis::init(1200, 1200);
 
-    let mut grid = Grid::new(80, 60);
+    let mut grid = Grid::new(60, 60);
     let mut snake = Snake::new(Position(40, 30), Direction(1,0));
 
-    thread::spawn(move || {
-        // some work here
-    });
+    snake::add_food(&mut grid, 3);
 
     'game: loop {
         for event in events.poll_iter() {
