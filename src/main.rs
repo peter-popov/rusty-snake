@@ -5,9 +5,7 @@ use sdl2::keyboard::Keycode;
 use std::thread;
 use std::time;
 
-
 pub mod snake;
-
 use snake::types::{Grid, Snake, Position, Direction};
 
 // this is main
@@ -64,7 +62,7 @@ fn main() {
         match result {
             Ok(_) => (),
             Err(_) => {
-                println!("Snake over!");
+                println!("Snake over! Score = {}", snake.length());
                 break 'game;
             }
         }
